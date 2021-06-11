@@ -1,10 +1,10 @@
 package com.saturnpro.wcounter;
 
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.lifecycle.ViewModelProvider;
 
 import android.content.Intent;
 import android.os.Bundle;
-import android.text.TextUtils;
 import android.view.View;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -13,14 +13,18 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class MainActivity extends AppCompatActivity {
-    public static final String EXTRA_REPLY = "com.saturnpro.wcounter.REPLY";
-    public static final int NEW_WORD_ACTIVITY_REQUEST_CODE = 1;
+    public static final String EXTRA_YES = "com.saturnpro.wcounter.YES";
+    public static final String EXTRA_NO = "com.saturnpro.wcounter.NO";
     private TextView text;
     private TextView counterTxt;
     List<String> words;
     int count = 0;
     int i = 0;
-    Intent replyIntent;
+    Intent intentYes;
+    Intent intentNo;
+
+    //test
+    private WordViewModel mWordViewModel;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -37,29 +41,29 @@ public class MainActivity extends AppCompatActivity {
         words.add("planet");
         words.add("space");
         words.add("kind");
-        text.setText(words.get(0));
         counterTxt.setText(count+"");
-        replyIntent = new Intent();
+        intentYes = new Intent(MainActivity.this, YesList.class);
+        intentNo = new Intent(MainActivity.this, NoList.class);
+
+        //test
+        mWordViewModel = new ViewModelProvider(this, ViewModelProvider.AndroidViewModelFactory.getInstance(getApplication())).get(WordViewModel.class);
     }
 
     public void addToYesList(View view) {
-        i++;
         if(i < words.size()) {
             String word = words.get(i);
             text.setText(word);
             count++;
             counterTxt.setText(count+"");
-            if(TextUtils.isEmpty(word)) {
-                setResult(RESULT_CANCELED, replyIntent);
-            }
-            else {
-                replyIntent.putExtra(EXTRA_REPLY, words.get(i));
-                setResult(RESULT_OK, replyIntent);
-            }
+            i++;
+            //нужно делать insert каждого слова в базу данных.
+            Words www = new Words(word);
+            mWordViewModel.insert(www);
         }
         else {
             text.setText("Слов больше нет");
         }
+
     }
 
     public void addToNoList(View view) {
@@ -67,14 +71,7 @@ public class MainActivity extends AppCompatActivity {
         if (i < words.size()) {
             String word = words.get(i);
             text.setText(word);
-            if(TextUtils.isEmpty(word)) {
-                setResult(RESULT_CANCELED, replyIntent);
-            }
-            else {
-                replyIntent.putExtra(EXTRA_REPLY, word);
-                setResult(RESULT_OK, replyIntent);
-            }
-            finish();
+            intentNo.putExtra(EXTRA_NO, word);
         }
         else {
             text.setText("Слов больше нет");
@@ -82,12 +79,10 @@ public class MainActivity extends AppCompatActivity {
     }
 
     public void iknow(View view) {
-        Intent i = new Intent(MainActivity.this, YesList.class);
-        startActivityForResult(i, NEW_WORD_ACTIVITY_REQUEST_CODE);
+        startActivity(intentYes);
     }
 
     public void idontknow(View view) {
-        Intent i = new Intent(MainActivity.this,NoList.class);
-        startActivity(i);
+        Toast.makeText(this, "Кнопка пока что закрыта", Toast.LENGTH_SHORT).show();
     }
 }

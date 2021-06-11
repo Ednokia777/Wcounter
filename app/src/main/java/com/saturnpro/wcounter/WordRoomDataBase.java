@@ -38,15 +38,10 @@ public abstract class WordRoomDataBase extends RoomDatabase {
         @Override
         public void onCreate(@NonNull SupportSQLiteDatabase db) {
             super.onCreate(db);
-            // If you want to keep data through app restarts,
-            // comment out the following block
             databaseWriteExecutor.execute(() -> {
                 WordDao dao = INSTANCE.wordDao();
                 dao.deleteAll();
-
-                Words words = new Words("Hello");
-                dao.insert(words);
-                words = new Words("World");
+                Words words = new Words("Тестовое слово");
                 dao.insert(words);
             });
         }

@@ -16,6 +16,11 @@ public interface WordDao {
     @Query("DELETE FROM word_table")
     void deleteAll();
 
+    //тут мы получаем весь список слов
     @Query("SELECT * FROM word_table ORDER BY word ASC")
     LiveData<List<Words>> getAlphabetizedWords();
+
+    @Insert(onConflict = OnConflictStrategy.IGNORE)
+    void insertAll(Words[] words);
+
 }
